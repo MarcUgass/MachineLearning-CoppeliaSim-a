@@ -4,6 +4,9 @@
 import tkinter
 import vrep
 from tkinter import messagebox
+import os
+import json
+import numpy as np
 
 def Salir():
     global root
@@ -55,7 +58,7 @@ def Columna1():
     etiqueta_salir.grid(row = 9, column = 0)
 
 def Columna2():
-    global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar
+    global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar, caja_umbral
     
     parametros = tkinter.Label(root, text= "Parámetros")
     parametros.grid(row = 1, column = 1)
@@ -90,61 +93,46 @@ def Columna2():
     caja_maxpuntos = tkinter.Entry(root, width =5)
     caja_maxpuntos.grid(row=7, column = 2)
     
-    etiqueta_maxpuntos = tkinter.Label(root, text= "UmbralDistancia:",anchor = "e")
-    etiqueta_maxpuntos.grid(row = 8, column = 1, sticky = "e")
-    caja_maxpuntos = tkinter.Entry(root, width =5)
-    caja_maxpuntos.grid(row=8, column = 2)
+    etiqueta_umbral = tkinter.Label(root, text= "UmbralDistancia:",anchor = "e")
+    etiqueta_umbral.grid(row = 8, column = 1, sticky = "e")
+    caja_umbral = tkinter.Entry(root, width =5)
+    caja_umbral.grid(row=8, column = 2)
     
-    boton_conectar = tkinter.Button(root, text= "Cambiar")
+    boton_conectar = tkinter.Button(root, text= "Cambiar", command = cambiar_valores)
     boton_conectar.grid(row = 9, column = 1)
 
 def Columna3():
-    global lista
+    global lista, caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar
     etiqueta = tkinter.Label(root, text= "Fichero para la captura")
     etiqueta.grid(row = 1, column = 3)
     
     lista = tkinter.Listbox(root, width=35,height=12)
     lista.grid(row= 2, column = 3, rowspan = 10)
-
-    boton_conectar = tkinter.Button(root, text="Cambiar", command=cambiar_valores)
-    boton_conectar.grid(row=9, column=1)
-
-def cargar_valores_desde_json(archivo):
-    try:
-        with open(archivo, 'r') as f:
-            data = json.load(f)
-            caja_iteraciones.delete(0, tkinter.END)
-            caja_iteraciones.insert(0, data.get('iteraciones', ''))
-            caja_cerca.delete(0, tkinter.END)
-            caja_cerca.insert(0, data.get('cerca', ''))
-            caja_media.delete(0, tkinter.END)
-            caja_media.insert(0, data.get('media', ''))
-            caja_lejos.delete(0, tkinter.END)
-            caja_lejos.insert(0, data.get('lejos', ''))
-            caja_minpuntos.delete(0, tkinter.END)
-            caja_minpuntos.insert(0, data.get('minpuntos', ''))
-            caja_maxpuntos.delete(0, tkinter.END)
-            caja_maxpuntos.insert(0, data.get('maxpuntos', ''))
-            caja_umbral.delete(0, tkinter.END)
-            caja_umbral.insert(0, data.get('umbraldistancia', ''))
-    except Exception as e:
-        messagebox.showerror("Error", f"No se pudo cargar el archivo: {str(e)}")
-
-def cambiar_valores():
-    seleccion = lista.curselection()
-    if seleccion:
-        indice = seleccion[0]
-        archivo_seleccionado = lista.get(indice)
-        cargar_valores_desde_json(archivo_seleccionado)
-
-# ... (código existente)
-
-def seleccionar_archivo():
-    directorio = "/ruta/del/directorio"  # Ruta del directorio donde se encuentran los archivos .json
-    archivos_json = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.json')]
-    lista.delete(0, tkinter.END)
-    for archivo in archivos_json:
-        lista.insert(tkinter.END, archivo)
+    
+    """
+    positivo = []
+    negativo = []
+    for i in range(1,6):
+        positivo.append(f"positivo{i}")
+        negativo.append(f"negativo{i}")
+    archivos = []
+    for p in positivo:
+        ruta = os.path.join(".", p)
+        archivos.append(os.listdir(ruta))
+    
+    for n in negativo:
+        ruta = os.path.join(".", n)
+        archivos.append(os.listdir(ruta))
+       
+    for archivo in archivos:
+        lista.insert(tkinter.END, archivo)  
+        
+    """
+    #archivos_json = [archivo for directorio in os.listdir()]
+    #lista.delete(0, tkinter.END)
+    #for archivo in archivos_json:
+        #lista.insert(tkinter.END, archivo)
+    
 
 def main():
     global root   
