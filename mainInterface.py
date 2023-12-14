@@ -110,29 +110,22 @@ def Columna3():
     lista = tkinter.Listbox(root, width=35,height=12)
     lista.grid(row= 2, column = 3, rowspan = 10)
     
-    """
-    positivo = []
-    negativo = []
-    for i in range(1,6):
-        positivo.append(f"positivo{i}")
-        negativo.append(f"negativo{i}")
-    archivos = []
-    for p in positivo:
-        ruta = os.path.join(".", p)
-        archivos.append(os.listdir(ruta))
+    #positivo
+    lista.insert(tkinter.END, f"positivo1/enPieCerca.json") 
+    lista.insert(tkinter.END, f"positivo2/enPieMedia.json")
+    lista.insert(tkinter.END, f"positivo3/enPieLejos.json")
+    lista.insert(tkinter.END, f"positivo4/sentadoCerca.json")
+    lista.insert(tkinter.END, f"positivo5/sentadoMedia.json")
+    lista.insert(tkinter.END, f"positivo6/sentadoLejos.json")
     
-    for n in negativo:
-        ruta = os.path.join(".", n)
-        archivos.append(os.listdir(ruta))
-       
-    for archivo in archivos:
-        lista.insert(tkinter.END, archivo)  
-        
-    """
-    #archivos_json = [archivo for directorio in os.listdir()]
-    #lista.delete(0, tkinter.END)
-    #for archivo in archivos_json:
-        #lista.insert(tkinter.END, archivo)
+    #negativo
+    lista.insert(tkinter.END, f"negativo1/cilindroMenorCerca.json")  
+    lista.insert(tkinter.END, f"negativo2/cilindroMenorMedia.json")
+    lista.insert(tkinter.END, f"negativo3/cilindroLejosLejosa.json")
+    lista.insert(tkinter.END, f"negativo4/cilindroMayorCerca.json")
+    lista.insert(tkinter.END, f"negativo5/cilindroMayorMedia.json")
+    lista.insert(tkinter.END, f"negativo6/cilindroMayorLejos.json")
+
         
 def cambiar_valores():
     global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
