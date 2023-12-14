@@ -133,6 +133,18 @@ def Columna3():
     #for archivo in archivos_json:
         #lista.insert(tkinter.END, archivo)
     
+def cambiar_valores():
+    global iteraciones, cerca, media, lejos, min_puntos, max_puntos, umbral
+
+    # Actualiza las variables globales con los valores de las entradas
+    iteraciones = caja_iteraciones.get()
+    cerca = caja_cerca.get()
+    media = caja_media.get()
+    lejos = caja_lejos.get()
+    min_puntos = caja_minpuntos.get()
+    max_puntos = caja_maxpuntos.get()
+    umbral = caja_umbral.get()
+
 
 def main():
     global root   
