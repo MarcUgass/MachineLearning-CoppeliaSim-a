@@ -40,7 +40,7 @@ def Columna1():
     etiqueta_estado = tkinter.Label(root, text= "Estado: No conectado a CoppeliaSim")
     etiqueta_estado.grid(row = 3, column = 0)
     
-    etiqueta_capturar = tkinter.Button(root, text= "Capturar", state = tkinter.DISABLED)
+    etiqueta_capturar = tkinter.Button(root, text= "Capturar", state = tkinter.DISABLED, command = capturar)
     etiqueta_capturar.grid(row = 4, column = 0)
     
     etiqueta_agrupar = tkinter.Button(root, text= "Agrupar", state = tkinter.DISABLED)
@@ -60,7 +60,6 @@ def Columna1():
 
 def Columna2():
     global caja_iteraciones, caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
-    global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar, caja_umbral
 
     etq_parametros = tkinter.Label(root, text= "Parámetros")
     etq_parametros.grid(row = 1, column = 1)
@@ -104,8 +103,10 @@ def Columna2():
     boton_conectar.grid(row = 9, column = 1)
 
 def Columna3():
+    global lista
     etiqueta = tkinter.Label(root, text= "Fichero para la captura")
     etiqueta.grid(row = 1, column = 3)
+
     
     lista = tkinter.Listbox(root, width=35,height=12)
     lista.grid(row= 2, column = 3, rowspan = 10)
@@ -126,7 +127,23 @@ def Columna3():
     lista.insert(tkinter.END, f"negativo5/cilindroMayorMedia.json")
     lista.insert(tkinter.END, f"negativo6/cilindroMayorLejos.json")
 
-        
+def capturar():
+    global lista
+    item = lista.curselection()
+    if not item:
+        messagebox.showwarning("Práctica PTC Tkinter Robótica","Debe elegir un fichero de la lista")
+        return
+    name = lista.get(item)
+    path = os.path.join(".", name) 
+    
+    if os.path.exists(path):
+        confirmacion = messagebox.askyesno("Práctica PTC Tkinter Robótica",f"Se va a crear el fichero: {name} ¿Está seguro?") 
+    else:
+        confirmacion = messagebox.askyesno("Práctica PTC Tkinter Robótica",f"El fichero: {name} Ya exste. Se creará de nuevo. ¿Está seguro?")
+    
+    if not confirmacion: #no acepta
+        return
+    
 def cambiar_valores():
     global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
 
