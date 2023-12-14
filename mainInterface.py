@@ -58,49 +58,49 @@ def Columna1():
     etiqueta_salir.grid(row = 9, column = 0)
 
 def Columna2():
-    global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar, caja_umbral
-    
-    parametros = tkinter.Label(root, text= "Parámetros")
-    parametros.grid(row = 1, column = 1)
-    
-    etiqueta_iteraciones = tkinter.Label(root, text= "Iteraciones:", anchor = "e")
-    etiqueta_iteraciones.grid(row = 2, column = 1, sticky = "e")
-    caja_iteraciones = tkinter.Entry(root, width =5)
-    caja_iteraciones.grid(row=2, column = 2)
-    
-    etiqueta_cerca = tkinter.Label(root, text= "Cerca:",anchor = "e")
-    etiqueta_cerca.grid(row = 3, column = 1, sticky = "e")
-    caja_cerca = tkinter.Entry(root, width =5)
-    caja_cerca.grid(row=3, column = 2)
-    
-    etiqueta_media = tkinter.Label(root, text= "Media:",anchor = "e")
-    etiqueta_media.grid(row = 4, column = 1, sticky = "e")
-    caja_media = tkinter.Entry(root, width =5)
-    caja_media.grid(row=4, column = 2)
-    
-    etiqueta_lejos = tkinter.Label(root, text= "Lejos:",anchor = "e")
-    etiqueta_lejos.grid(row = 5, column = 1, sticky = "e")
-    caja_lejos = tkinter.Entry(root, width =5)
-    caja_lejos.grid(row=5, column = 2)
-    
-    etiqueta_minpuntos = tkinter.Label(root, text= "MinPuntos:",anchor = "e")
-    etiqueta_minpuntos.grid(row = 6, column = 1, sticky = "e")
-    caja_minpuntos = tkinter.Entry(root, width =5)
-    caja_minpuntos.grid(row=6, column = 2)
-    
-    etiqueta_maxpuntos = tkinter.Label(root, text= "MaxPuntos:",anchor = "e")
-    etiqueta_maxpuntos.grid(row = 7, column = 1, sticky = "e")
-    caja_maxpuntos = tkinter.Entry(root, width =5)
-    caja_maxpuntos.grid(row=7, column = 2)
-    
-    etiqueta_umbral = tkinter.Label(root, text= "UmbralDistancia:",anchor = "e")
-    etiqueta_umbral.grid(row = 8, column = 1, sticky = "e")
-    caja_umbral = tkinter.Entry(root, width =5)
-    caja_umbral.grid(row=8, column = 2)
-    
-    boton_conectar = tkinter.Button(root, text= "Cambiar", command = cambiar_valores)
-    boton_conectar.grid(row = 9, column = 1)
+    global caja_iteraciones, caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
 
+    parametros = tkinter.Label(root, text="Parámetros")
+    parametros.grid(row=1, column=1)
+
+    etiqueta_iteraciones = tkinter.Label(root, text="Iteraciones:", anchor="e")
+    etiqueta_iteraciones.grid(row=2, column=1, sticky="e")
+    caja_iteraciones = tkinter.Entry(root, width=5, textvariable=iteraciones)
+    caja_iteraciones.grid(row=2, column=2)
+
+    etiqueta_cerca = tkinter.Label(root, text="Cerca:", anchor="e")
+    etiqueta_cerca.grid(row=3, column=1, sticky="e")
+    caja_cerca = tkinter.Entry(root, width=5, textvariable=cerca)
+    caja_cerca.grid(row=3, column=2)
+
+    etiqueta_media = tkinter.Label(root, text="Media:", anchor="e")
+    etiqueta_media.grid(row=4, column=1, sticky="e")
+    caja_media = tkinter.Entry(root, width=5, textvariable=media)
+    caja_media.grid(row=4, column=2)
+
+    etiqueta_lejos = tkinter.Label(root, text="Lejos:", anchor="e")
+    etiqueta_lejos.grid(row=5, column=1, sticky="e")
+    caja_lejos = tkinter.Entry(root, width=5, textvariable=lejos)
+    caja_lejos.grid(row=5, column=2)
+
+    etiqueta_minpuntos = tkinter.Label(root, text="MinPuntos:", anchor="e")
+    etiqueta_minpuntos.grid(row=6, column=1, sticky="e")
+    caja_minpuntos = tkinter.Entry(root, width=5, textvariable=min_puntos)
+    caja_minpuntos.grid(row=6, column=2)
+
+    etiqueta_maxpuntos = tkinter.Label(root, text="MaxPuntos:", anchor="e")
+    etiqueta_maxpuntos.grid(row=7, column=1, sticky="e")
+    caja_maxpuntos = tkinter.Entry(root, width=5, textvariable=max_puntos)
+    caja_maxpuntos.grid(row=7, column=2)
+
+    etiqueta_umbral = tkinter.Label(root, text="UmbralDistancia:", anchor="e")
+    etiqueta_umbral.grid(row=8, column=1, sticky="e")
+    caja_umbral = tkinter.Entry(root, width=5, textvariable=umbral)
+    caja_umbral.grid(row=8, column=2)
+
+    boton_conectar = tkinter.Button(root, text="Cambiar", command=cambiar_valores)
+    boton_conectar.grid(row=9, column=1)
+    
 def Columna3():
     global lista, caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, boton_conectar
     etiqueta = tkinter.Label(root, text= "Fichero para la captura")
@@ -132,18 +132,16 @@ def Columna3():
     #lista.delete(0, tkinter.END)
     #for archivo in archivos_json:
         #lista.insert(tkinter.END, archivo)
-    
-def cambiar_valores():
-    global iteraciones, cerca, media, lejos, min_puntos, max_puntos, umbral
 
-    # Actualiza las variables globales con los valores de las entradas
-    iteraciones = caja_iteraciones.get()
-    cerca = caja_cerca.get()
-    media = caja_media.get()
-    lejos = caja_lejos.get()
-    min_puntos = caja_minpuntos.get()
-    max_puntos = caja_maxpuntos.get()
-    umbral = caja_umbral.get()
+def cambiar_valores():
+    # Actualiza las variables de cadena con los valores de las entradas
+    iteraciones.set(caja_iteraciones.get())
+    cerca.set(caja_cerca.get())
+    media.set(caja_media.get())
+    lejos.set(caja_lejos.get())
+    min_puntos.set(caja_minpuntos.get())
+    max_puntos.set(caja_maxpuntos.get())
+    umbral.set(caja_umbral.get())
 
 
 def main():
