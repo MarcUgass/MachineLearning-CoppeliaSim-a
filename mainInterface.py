@@ -7,7 +7,7 @@ from tkinter import messagebox
 import os
 import json
 import numpy as np
-from parametros import iteraciones
+from parametros import instancia
 
 def Salir():
     global root
@@ -135,18 +135,18 @@ def Columna3():
         #lista.insert(tkinter.END, archivo)
         
 def cambiar_valores():
-    global lista, caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
+    global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
 
     # Actualiza las variables globales con los valores de las entradas
-    iteraciones = int(caja_iteraciones)
-    cerca = int(caja_cerca)
-    media = int(caja_media)
-    lejos = int(caja_lejos)
-    min_puntos = int(caja_minpuntos)
-    max_puntos = int(caja_maxpuntos)
-    umbral = int(caja_umbral)
+    iteraciones = int(caja_iteraciones.get())
+    cerca = int(caja_cerca.get())
+    media = int(caja_media.get())
+    lejos = int(caja_lejos.get())
+    min_puntos = int(caja_minpuntos.get())
+    max_puntos = int(caja_maxpuntos.get())
+    umbral = int(caja_umbral.get())
     
-    print(iteraciones)
+    instancia.set_valores(iteraciones, cerca, media, lejos, min_puntos, max_puntos, umbral)
 
 def main():
     global root   
