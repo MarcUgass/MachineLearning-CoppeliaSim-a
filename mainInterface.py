@@ -106,6 +106,46 @@ def Columna3():
     lista = tkinter.Listbox(root, width=35,height=12)
     lista.grid(row= 2, column = 3, rowspan = 10)
 
+    boton_conectar = tkinter.Button(root, text="Cambiar", command=cambiar_valores)
+    boton_conectar.grid(row=9, column=1)
+
+def cargar_valores_desde_json(archivo):
+    try:
+        with open(archivo, 'r') as f:
+            data = json.load(f)
+            caja_iteraciones.delete(0, tkinter.END)
+            caja_iteraciones.insert(0, data.get('iteraciones', ''))
+            caja_cerca.delete(0, tkinter.END)
+            caja_cerca.insert(0, data.get('cerca', ''))
+            caja_media.delete(0, tkinter.END)
+            caja_media.insert(0, data.get('media', ''))
+            caja_lejos.delete(0, tkinter.END)
+            caja_lejos.insert(0, data.get('lejos', ''))
+            caja_minpuntos.delete(0, tkinter.END)
+            caja_minpuntos.insert(0, data.get('minpuntos', ''))
+            caja_maxpuntos.delete(0, tkinter.END)
+            caja_maxpuntos.insert(0, data.get('maxpuntos', ''))
+            caja_umbral.delete(0, tkinter.END)
+            caja_umbral.insert(0, data.get('umbraldistancia', ''))
+    except Exception as e:
+        messagebox.showerror("Error", f"No se pudo cargar el archivo: {str(e)}")
+
+def cambiar_valores():
+    seleccion = lista.curselection()
+    if seleccion:
+        indice = seleccion[0]
+        archivo_seleccionado = lista.get(indice)
+        cargar_valores_desde_json(archivo_seleccionado)
+
+# ... (código existente)
+
+def seleccionar_archivo():
+    directorio = "/ruta/del/directorio"  # Ruta del directorio donde se encuentran los archivos .json
+    archivos_json = [archivo for archivo in os.listdir(directorio) if archivo.endswith('.json')]
+    lista.delete(0, tkinter.END)
+    for archivo in archivos_json:
+        lista.insert(tkinter.END, archivo)
+
 def main():
     global root   
     root = tkinter.Tk()
