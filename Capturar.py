@@ -11,6 +11,8 @@ import glob
 import sys
 import cv2
 import numpy as np
+import random
+import math
 
 
 def capturar(path, clientID):
@@ -23,49 +25,130 @@ def capturar(path, clientID):
     
     #acceder a los datos del laser
     _, datosLaserComp = vrep.simxGetStringSignal(clientID,'LaserData',vrep.simx_opmode_streaming)
-       
-    # obtenermos la referencia a la persona Bill para moverla    
-    _, personhandle = vrep.simxGetObjectHandle(clientID, 'Bill#0', vrep.simx_opmode_oneshot_wait)
-        
-       
-    #Iniciar la camara y esperar un segundo para llenar el buffer
-    _, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
-    time.sleep(1)
-    plt.axis('equal')
-    plt.axis([0, 4, -2, 2])
-    
-    print("Directorio de trabajo es: ", os.getcwd())
     
     partes = path.split("/")
-    parte1 = partes[0]
-    parte2 = partes[1].split(".")[0]
+    parte1 = partes[1]
+    parte2 = partes[2].split(".")[0]
     
-    listaDir=sorted(glob.glob(parte1))
+    if parte1.startswith("positivo"):
+       
+        # obtenermos la referencia a la persona Bill para moverla    
+        _, personhandle = vrep.simxGetObjectHandle(clientID, 'Bill#0', vrep.simx_opmode_oneshot_wait)
+            
+           
+        #Iniciar la camara y esperar un segundo para llenar el buffer
+        _, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
+        time.sleep(1)
+        plt.axis('equal')
+        plt.axis([0, 4, -2, 2])
+        
+        #print("Directorio de trabajo es: ", os.getcwd())
+        direct = os.path.join(".", parte1) 
+        
+        #listaDir=sorted(glob.glob(direct))
+    
+        #nuevoDir=parte1+str(len(listaDir))
+        """
+        if (os.path.isdir(nuevoDir)):
+            sys.exit("Error: ya existe el directorio "+ nuevoDir)
+        else:
+            os.mkdir(nuevoDir)
+            os.chdir(nuevoDir)
+            print("Cambiando el directorio de trabajo: ", os.getcwd())
+        """
+        #print("Cambiando el directorio de trabajo: ", os.getcwd())
+        os.chdir(parte1)
+        #print("Cambiando el directorio de trabajo: ", os.getcwd())
+        cabecera={"TiempoSleep":time.sleep(0.5),
+                  "MaxIteraciones":instancia.iteraciones}
+        
+        ficheroLaser=open("enPieCerca.json", "w")
+    
+        ficheroLaser.write(json.dumps(cabecera)+'\n')
+        
+        i = 0
+        
+        seguir=True
+        xmin = 0
+        xmax = 0
+        
+        if parte2 == "enPieCerca" or "sentadoCerca":
+            xmin = instancia.cerca #0.5
+            xmax = instancia.media #1.5
+        if parte2 == "enPieMedia" or "sentadoMedia":
+            xmin = instancia.media #1.5
+            xmax = instancia.lejos #2.5
+        if parte2 == "enPieLejos" or "sentadoLejos":
+            xmin = instancia.lejos #2.5
+            xmax = instancia.lejos + 1 #3.5   
+            
+        while(i<instancia.iteraciones and seguir):
+            
+            x_pos = random.uniform(xmin,xmax)
+            angulo = random.uniform(0, 360)
+            radianes = math.radians(angulo)
+            
+            #Situamos donde queremos a la persona sentada, unidades en metros
+            returnCode = vrep.simxSetObjectPosition(clientID,personhandle,-1,[x_pos,0.0,0.0],vrep.simx_opmode_oneshot)
+            
+            #Cambiamos la orientacion, ojo está en radianes: Para pasar de grados a radianes hay que multiplicar por PI y dividir por 180
+            returnCode = vrep.simxSetObjectOrientation(clientID, personhandle, -1, [0.0,0.0,radianes], vrep.simx_opmode_oneshot)
+            
+            time.sleep(0.5)
+            
+            puntosx=[] #listas para recibir las coordenadas x, y z de los puntos detectados por el laser
+            puntosy=[]
+            puntosz=[]
+            returnCode, signalValue = vrep.simxGetStringSignal(clientID,'LaserData',vrep.simx_opmode_buffer) 
+           
+            datosLaser=vrep.simxUnpackFloats(signalValue)
+            for indice in range(0,len(datosLaser),3):
+                puntosx.append(datosLaser[indice+1])
+                puntosy.append(datosLaser[indice+2])
+                puntosz.append(datosLaser[indice])
+            
+            print("Iteración: ", i)         
+            plt.clf()    
+            plt.plot(puntosx, puntosy, 'r.')
+            plt.savefig('Plot'+str(i)+'.jpg')
+            plt.show()
+            
+            
+            #Guardamos los puntosx, puntosy en el fichero JSON
+            lectura={"Iteracion":i, "PuntosX":puntosx, "PuntosY":puntosy}
+            #ficheroLaser.write('{}\n'.format(json.dumps(lectura)))
+            ficheroLaser.write(json.dumps(lectura)+'\n')
+            
+            #Guardar frame de la camara, rotarlo y convertirlo a BGR
+            _, resolution, image=vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_buffer)
+            img = np.array(image, dtype = np.uint8)
+            img.resize([resolution[0], resolution[1], 3])
+            img = np.rot90(img,2)
+            img = np.fliplr(img)
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            #salvo a disco la imagen
+            cv2.imwrite('Iteracion'+str(i)+'.jpg', img)
+         
+            #Mostrar frame y salir con "ESC"
+            cv2.imshow('Image', img)
+              
+            
+            tecla = cv2.waitKey(5) & 0xFF
+            if tecla == 27:
+                seguir=False
+            
+            i=i+1
+        #detenemos la simulacion
+        vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
 
-    nuevoDir=parte1+str(len(listaDir))
+        #cerramos la conexion
+        vrep.simxFinish(clientID)
 
-    if (os.path.isdir(nuevoDir)):
-        sys.exit("Error: ya existe el directorio "+ nuevoDir)
+        #cerramos las ventanas
+        cv2.destroyAllWindows()
+
+        finFichero={"Iteraciones totales":i}
+        ficheroLaser.write(json.dumps(finFichero)+'\n')
+        ficheroLaser.close()
     else:
-        os.mkdir(nuevoDir)
-        os.chdir(nuevoDir)
-        print("Cambiando el directorio de trabajo: ", os.getcwd())
-    
-    cabecera={"TiempoSleep":time.sleep(0.5),
-              "MaxIteraciones":instancia.iteraciones}
-    
-    ficheroLaser=open("enPieCerca.json", "w")
-
-    ficheroLaser.write(json.dumps(cabecera)+'\n')
-    
-    i = 0
-    
-    seguir=True
-     
-    while(i<=instancia.iteraciones and seguir):
-        
-        #Situamos donde queremos a la persona sentada, unidades en metros
-        returnCode = vrep.simxSetObjectPosition(clientID,personhandle,-1,[1+2.0*i/10,-0.4,0.0],vrep.simx_opmode_oneshot)
-        
-        #Cambiamos la orientacion, ojo está en radianes: Para pasar de grados a radianes hay que multiplicar por PI y dividir por 180
-        returnCode = vrep.simxSetObjectOrientation(clientID, personhandle, -1, [0.0,0.0,3.05-(0.20)*i], vrep.simx_opmode_oneshot)
+        return
