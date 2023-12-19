@@ -4,6 +4,7 @@
 import os
 import json
 import math
+from parametros import instancia
 
 def agrupar_clusters():
     carpetas_positivas = ["positivo1", "positivo2", "positivo3", "positivo4", "positivo5", "positivo6"]
@@ -18,9 +19,9 @@ def agrupar_clusters():
     for carpeta in carpetas_negativas:
         archivos_negativos.extend([os.path.join(carpeta, archivo) for archivo in os.listdir(carpeta) if archivo.endswith(".json")])
 
-    min_puntos = 5  # Ajusta según tus necesidades
-    max_puntos = 30  # Ajusta según tus necesidades
-    umbral_distancia = 0.1  # Ajusta según tus necesidades
+    min_puntos = instancia.min_puntos # Ajusta según tus necesidades
+    max_puntos = instancia.max_puntos  # Ajusta según tus necesidades
+    umbral_distancia = instancia.umbral  # Ajusta según tus necesidades
 
     clusters_positivos = agrupar_puntos(archivos_positivos, min_puntos, max_puntos, umbral_distancia)
     clusters_negativos = agrupar_puntos(archivos_negativos, min_puntos, max_puntos, umbral_distancia)
@@ -38,10 +39,12 @@ def agrupar_puntos(archivos, min_puntos, max_puntos, umbral_distancia):
             lineas = f.readlines()
         
         for linea in lineas:
-            datos = json.loads(linea)
-            puntos_x = datos["PuntosX"]
-            puntos_y = datos["PuntosY"]
-            
+            try:
+                datos = json.loads(linea)
+                puntos_x = datos["PuntosX"]
+                puntos_y = datos["PuntosY"]
+            except:
+                continue
             for i in range(len(puntos_x)):
                 punto_actual = {"x": puntos_x[i], "y": puntos_y[i]}
                 
