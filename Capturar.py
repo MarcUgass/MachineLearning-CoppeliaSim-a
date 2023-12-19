@@ -31,10 +31,12 @@ def capturar(path, clientID):
     parte2 = partes[2].split(".")[0]
     
     if parte1.startswith("positivo"):
-       
+        
+        if parte2.startswith("enPie"):
         # obtenermos la referencia a la persona Bill para moverla    
-        _, personhandle = vrep.simxGetObjectHandle(clientID, 'Bill#0', vrep.simx_opmode_oneshot_wait)
-            
+            _, personhandle = vrep.simxGetObjectHandle(clientID, 'Bill#0', vrep.simx_opmode_oneshot_wait)
+        else:
+            _, personhandle = vrep.simxGetObjectHandle(clientID, 'Bill', vrep.simx_opmode_oneshot_wait)
            
         #Iniciar la camara y esperar un segundo para llenar el buffer
         _, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
@@ -42,27 +44,13 @@ def capturar(path, clientID):
         plt.axis('equal')
         plt.axis([0, 4, -2, 2])
         
-        #print("Directorio de trabajo es: ", os.getcwd())
-        direct = os.path.join(".", parte1) 
-        
-        #listaDir=sorted(glob.glob(direct))
-    
-        #nuevoDir=parte1+str(len(listaDir))
-        """
-        if (os.path.isdir(nuevoDir)):
-            sys.exit("Error: ya existe el directorio "+ nuevoDir)
-        else:
-            os.mkdir(nuevoDir)
-            os.chdir(nuevoDir)
-            print("Cambiando el directorio de trabajo: ", os.getcwd())
-        """
         #print("Cambiando el directorio de trabajo: ", os.getcwd())
         os.chdir(parte1)
         #print("Cambiando el directorio de trabajo: ", os.getcwd())
         cabecera={"TiempoSleep":time.sleep(0.5),
                   "MaxIteraciones":instancia.iteraciones}
         
-        ficheroLaser=open("enPieCerca.json", "w")
+        ficheroLaser=open(f"{parte2}.json", "w")
     
         ficheroLaser.write(json.dumps(cabecera)+'\n')
         
@@ -72,13 +60,13 @@ def capturar(path, clientID):
         xmin = 0
         xmax = 0
         
-        if parte2 == "enPieCerca" or "sentadoCerca":
+        if parte2 == "enPieCerca" or parte2 == "sentadoCerca":
             xmin = instancia.cerca #0.5
             xmax = instancia.media #1.5
-        if parte2 == "enPieMedia" or "sentadoMedia":
+        if parte2 == "enPieMedia" or parte2 == "sentadoMedia":
             xmin = instancia.media #1.5
             xmax = instancia.lejos #2.5
-        if parte2 == "enPieLejos" or "sentadoLejos":
+        if parte2 == "enPieLejos" or parte2 == "sentadoLejos":
             xmin = instancia.lejos #2.5
             xmax = instancia.lejos + 1 #3.5   
             
@@ -106,13 +94,14 @@ def capturar(path, clientID):
                 puntosx.append(datosLaser[indice+1])
                 puntosy.append(datosLaser[indice+2])
                 puntosz.append(datosLaser[indice])
-            
+                
+            """
             print("Iteración: ", i)         
             plt.clf()    
             plt.plot(puntosx, puntosy, 'r.')
             plt.savefig('Plot'+str(i)+'.jpg')
             plt.show()
-            
+            """
             
             #Guardamos los puntosx, puntosy en el fichero JSON
             lectura={"Iteracion":i, "PuntosX":puntosx, "PuntosY":puntosy}
@@ -151,4 +140,58 @@ def capturar(path, clientID):
         ficheroLaser.write(json.dumps(finFichero)+'\n')
         ficheroLaser.close()
     else:
-        return
+        
+        #Iniciar la camara y esperar un segundo para llenar el buffer
+        _, resolution, image = vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_streaming)
+        time.sleep(1)
+        plt.axis('equal')
+        plt.axis([0, 4, -2, 2])
+        os.chdir(parte1)
+        
+        ficheroLaser=open(f"{parte2}.json", "w")
+    
+        puntosx=[] #listas para recibir las coordenadas x, y z de los puntos detectados por el laser
+        puntosy=[]
+        puntosz=[]
+        returnCode, signalValue = vrep.simxGetStringSignal(clientID,'LaserData',vrep.simx_opmode_buffer) 
+       
+        datosLaser=vrep.simxUnpackFloats(signalValue)
+        for indice in range(0,len(datosLaser),3):
+            puntosx.append(datosLaser[indice+1])
+            puntosy.append(datosLaser[indice+2])
+            puntosz.append(datosLaser[indice])
+            
+        #Guardamos los puntosx, puntosy en el fichero JSON
+        lectura={"PuntosX":puntosx, "PuntosY":puntosy}
+        #ficheroLaser.write('{}\n'.format(json.dumps(lectura)))
+        ficheroLaser.write(json.dumps(lectura)+'\n')
+        
+        #Guardar frame de la camara, rotarlo y convertirlo a BGR
+        _, resolution, image=vrep.simxGetVisionSensorImage(clientID, camhandle, 0, vrep.simx_opmode_buffer)
+        img = np.array(image, dtype = np.uint8)
+        img.resize([resolution[0], resolution[1], 3])
+        img = np.rot90(img,2)
+        img = np.fliplr(img)
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        #salvo a disco la imagen
+        cv2.imwrite(parte2 +'.jpg', img)
+     
+        #Mostrar frame y salir con "ESC"
+        cv2.imshow('Image', img)
+          
+        
+        tecla = cv2.waitKey(5) & 0xFF
+        if tecla == 27:
+            seguir=False
+          
+        #detenemos la simulacion
+        vrep.simxStopSimulation(clientID,vrep.simx_opmode_oneshot_wait)
+
+        #cerramos la conexion
+        vrep.simxFinish(clientID)
+
+        #cerramos las ventanas
+        cv2.destroyAllWindows()
+
+        ficheroLaser.close()
+        

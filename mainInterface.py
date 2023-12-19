@@ -5,8 +5,6 @@ import tkinter
 import vrep
 from tkinter import messagebox
 import os
-import json
-import numpy as np
 from parametros import instancia
 from Capturar import capturar
 
