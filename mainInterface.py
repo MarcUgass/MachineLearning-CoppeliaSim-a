@@ -7,7 +7,19 @@ from tkinter import messagebox
 import os
 from parametros import instancia
 from Capturar import capturar
+from Agrupar import agrupar_clusters
 
+def debug():
+    etiqueta_desconectar.config(state = tkinter.ACTIVE)
+    etiqueta_capturar.config(state = tkinter.ACTIVE)
+    etiqueta_conectar.config(state = tkinter.ACTIVE)
+    etiqueta_estado.config(state = tkinter.ACTIVE)
+    etiqueta_agrupar.config(state = tkinter.ACTIVE)
+    etiqueta_extraer.config(state = tkinter.ACTIVE)
+    etiqueta_entrenar.config(state = tkinter.ACTIVE)
+    etiqueta_predecir.config(state = tkinter.ACTIVE)
+    etiqueta_salir.config(state = tkinter.ACTIVE)
+    
 def DesconectarCoppelia():
     global clientID
     
@@ -47,7 +59,7 @@ def ConectarCoppelia():
         messagebox.showerror("Práctica PTC Tkinter Robótica","Debe iniciar el simulador")
 
 def Columna1():
-    global root , etiqueta_conectar, etiqueta_desconectar, etiqueta_estado, etiqueta_capturar, etiqueta_agrupar ,etiqueta_extraer, etiqueta_entrenar, etiqueta_predecir, etiqueta_salir
+    global root , etiqueta_conectar, etiqueta_desconectar, etiqueta_estado, etiqueta_capturar, etiqueta_agrupar ,etiqueta_extraer, etiqueta_entrenar, etiqueta_predecir, etiqueta_salir, etiqueta_debug
     etiqueta = tkinter.Label(root, text= "Es necesario ejecutar el simulador CoppeliaSim")
     etiqueta.grid(row = 0, column = 0)
     
@@ -63,7 +75,7 @@ def Columna1():
     etiqueta_capturar = tkinter.Button(root, text= "Capturar", state = tkinter.DISABLED, command = capturar_boton)
     etiqueta_capturar.grid(row = 4, column = 0)
     
-    etiqueta_agrupar = tkinter.Button(root, text= "Agrupar", state = tkinter.DISABLED)
+    etiqueta_agrupar = tkinter.Button(root, text= "Agrupar", state = tkinter.DISABLED, command = agrupar_boton)
     etiqueta_agrupar.grid(row = 5, column = 0)
     
     etiqueta_extraer = tkinter.Button(root, text= "Extraer características", state = tkinter.DISABLED)
@@ -77,6 +89,9 @@ def Columna1():
     
     etiqueta_salir = tkinter.Button(root, text= "Salir", command = Salir)
     etiqueta_salir.grid(row = 9, column = 0)
+    
+    etiqueta_debug = tkinter.Button(root, text= "DEBUG", command = debug)
+    etiqueta_debug.grid(row = 10, column = 0)
 
 def Columna2():
     global caja_iteraciones, caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
@@ -143,7 +158,7 @@ def Columna3():
     #negativo
     lista.insert(tkinter.END, f"negativo1/cilindroMenorCerca.json")  
     lista.insert(tkinter.END, f"negativo2/cilindroMenorMedia.json")
-    lista.insert(tkinter.END, f"negativo3/cilindroLejosLejosa.json")
+    lista.insert(tkinter.END, f"negativo3/cilindroMenorLejos.json")
     lista.insert(tkinter.END, f"negativo4/cilindroMayorCerca.json")
     lista.insert(tkinter.END, f"negativo5/cilindroMayorMedia.json")
     lista.insert(tkinter.END, f"negativo6/cilindroMayorLejos.json")
@@ -184,7 +199,7 @@ def cambiar_valores():
         instancia.set_valores(0, 0, 0, 0, 0, 0, 0)
     
 def agrupar_boton():
-    return
+    agrupar_clusters()
 
 def main():    
     global root
