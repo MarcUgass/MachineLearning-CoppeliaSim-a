@@ -11,20 +11,29 @@ simplefilter(action='ignore', category=FutureWarning)
 simplefilter(action='ignore', category=DeprecationWarning)
 
 # Función para cargar los datos desde un archivo JSON
-def cargar_datos(caracteristicas_file):
-    caracteristicas_data = pd.read_json(caracteristicas_file, lines=True)
+def cargar_datos(archivo_dat):
+    with open(archivo_dat, 'r') as file:
+        datos = json.load(file)
+    
+    # Aquí asumimos que los datos en el archivo están en el formato esperado
+    numero_cluster = datos['numero_cluster']
+    numero_puntos = datos['numero_puntos']
+    perimetro = datos['perímetro']
+    profundidad = datos['profundidad']
+    anchura = datos['anchura']
+    
+    # Aquí debes adaptar según la estructura real de tus datos
+    # En este ejemplo, estamos creando un DataFrame simple
+    df = pd.DataFrame({
+        'numero_cluster': [numero_cluster] * numero_puntos,
+        'perimetro': [perimetro] * numero_puntos,
+        'profundidad': [profundidad] * numero_puntos,
+        'anchura': [anchura] * numero_puntos,
+        'esPierna': [1]  # Aquí debes ajustar según la disponibilidad real de la etiqueta
+    })
 
-    # Obtener todos los atributos que no son 'numero_cluster'
-    X = caracteristicas_data.drop(columns=['numero_cluster', 'numero_puntos', 'perímetro', 'profundidad', 'anchura'])
-
-    # Usar 'numero_cluster' como etiqueta si existe
-    if 'numero_cluster' in caracteristicas_data:
-        y = caracteristicas_data['numero_cluster']
-    else:
-        y = None
-
-    return X, y
-
+    return df
+    
 # Función para dividir los datos en conjuntos de entrenamiento y prueba
 def dividir_datos(X, y):
     return train_test_split(X, y, test_size=0.20, random_state=25)
@@ -68,13 +77,19 @@ def entrenar():
     caracteristicas_file_no_piernas = "caracteristicasNoPiernas.dat"
 
     # Cargar datos de piernas y no piernas
-    X_piernas, y_piernas = cargar_datos(caracteristicas_file_piernas)
-    X_no_piernas, y_no_piernas = cargar_datos(caracteristicas_file_no_piernas)
+    datos_piernas = cargar_datos_desde_dat(archivo_dat_piernas)
+    datos_no_piernas = cargar_datos_desde_dat(archivo_dat_no_piernas)
 
     # Dividir datos en conjuntos de entrenamiento y prueba
     X_train_piernas, X_test_piernas, y_train_piernas, y_test_piernas = dividir_datos(X_piernas, y_piernas)
     X_train_no_piernas, X_test_no_piernas, y_train_no_piernas, y_test_no_piernas = dividir_datos(X_no_piernas, y_no_piernas)
 
+    datos_piernas['esPierna'] = 1
+    datos_no_piernas['esPierna'] = 0
+
+    datos_combinados = pd.concat([datos_piernas, datos_no_piernas], ignore_index=True)
+
+    X_train, X_test, y_train, y_test = dividir_datos(datos_combinados[['perimetro', 'profundidad', 'anchura']], datos_combinados['esPierna'])
     # Kernels a probar
     kernels = ['linear', 'poly', 'rbf']
 
