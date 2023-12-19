@@ -93,4 +93,45 @@ def main():
 
     print("\n== Búsqueda de parámetros en un rango en el caso de RBF ==")
     mejor_svc_rbf_piernas = grid_search_rbf(X_train_piernas, y_train_piernas)
-    mejor_svc_rbf_no_piernas =
+    mejor_svc_rbf_no_piernas = grid_search_rbf(X_train_no_piernas, y_train_no_piernas)
+
+    # Guardar clasificadores
+    guardar_clasificador(svc_piernas, "clasificador_piernas.pkl")
+    guardar_clasificador(svc_no_piernas, "clasificador_no_piernas.pkl")
+    guardar_clasificador(mejor_svc_rbf_piernas, "clasificador_mejor_rbf_piernas.pkl")
+    guardar_clasificador(mejor_svc_rbf_no_piernas, "clasificador_mejor_rbf_no_piernas.pkl")
+
+    # Cargar clasificadores
+    clasificador_piernas = cargar_clasificador("clasificador_piernas.pkl")
+    clasificador_no_piernas = cargar_clasificador("clasificador_no_piernas.pkl")
+    clasificador_mejor_rbf_piernas = cargar_clasificador("clasificador_mejor_rbf_piernas.pkl")
+    clasificador_mejor_rbf_no_piernas = cargar_clasificador("clasificador_mejor_rbf_no_piernas.pkl")
+
+    # Ejemplo de predicción
+    print("\n== Ejemplo de Predicción con Clasificador de Piernas ==")
+    ejemplo_piernas = np.array([[0.23, 0.12, 0.15]])
+    prediccion_piernas = clasificador_piernas.predict(ejemplo_piernas)
+    print(f"Predicción: {prediccion_piernas}")
+
+    # Ejemplo de predicción
+    print("\n== Ejemplo de Predicción con Clasificador de No Piernas ==")
+    ejemplo_no_piernas = np.array([[0.45, 0.25, 0.30]])
+    prediccion_no_piernas = clasificador_no_piernas.predict(ejemplo_no_piernas)
+    print(f"Predicción: {prediccion_no_piernas}")
+
+    # Ejemplo de predicción
+    print("\n== Ejemplo de Predicción con Clasificador RBF de Piernas ==")
+    ejemplo_rbf_piernas = np.array([[0.35, 0.20, 0.25]])
+    prediccion_rbf_piernas = clasificador_mejor_rbf_piernas.predict(ejemplo_rbf_piernas)
+    print(f"Predicción: {prediccion_rbf_piernas}")
+
+    # Ejemplo de predicción
+    print("\n== Ejemplo de Predicción con Clasificador RBF de No Piernas ==")
+    ejemplo_rbf_no_piernas = np.array([[0.55, 0.30, 0.35]])
+    prediccion_rbf_no_piernas = clasificador_mejor_rbf_no_piernas.predict(ejemplo_rbf_no_piernas)
+    print(f"Predicción: {prediccion_rbf_no_piernas}")
+
+
+if __name__ == "__main__":
+    main()
+
