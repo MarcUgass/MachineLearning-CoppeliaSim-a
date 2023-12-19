@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
 import json
@@ -6,6 +7,7 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from warnings import simplefilter
+import pickle
 
 # Ignorar futuras y advertencias de depreciación
 simplefilter(action='ignore', category=FutureWarning)
@@ -43,6 +45,9 @@ def clasificar_y_evaluar(kernel, X_train, X_test, y_train, y_test):
     scores = cross_val_score(svc_cv, X_train, y_train, cv=5)
     print(f"Accuracy 5-cross validation ({kernel}): {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
 
+    # Guardar el clasificador en un archivo
+    guardar_clasificador(svc, f"clasificador_{kernel}.pkl")
+
     return svc
 
 # Función para realizar una búsqueda de parámetros en el caso de kernel RBF
@@ -52,7 +57,17 @@ def grid_search_rbf(X_train, y_train):
     clf = clf.fit(X_train, y_train)
     print("Mejor estimador encontrado")
     print(clf.best_estimator_)
+
+    # Guardar el clasificador en un archivo
+    guardar_clasificador(clf.best_estimator_, "clasificador_rbf.pkl")
+
     return clf.best_estimator_
+
+# Función para guardar el clasificador en un archivo
+def guardar_clasificador(clasificador, filename="clasificador.pkl"):
+    with open(filename, "wb") as archivo:
+        pickle.dump(clasificador, archivo)
+    print(f"Clasificador guardado en {filename}")
 
 # Función principal
 def entrenar():
@@ -63,7 +78,6 @@ def entrenar():
     datos_piernas = cargar_datos(archivo_dat_piernas)
     datos_no_piernas = cargar_datos(archivo_dat_no_piernas)
 
-    
     datos_piernas['esPierna'] = 1
     datos_no_piernas['esPierna'] = 0
 
@@ -79,4 +93,3 @@ def entrenar():
 
     print("\n== Búsqueda de parámetros en un rango en el caso de RBF ==")
     _ = grid_search_rbf(X_train, y_train)
-    
