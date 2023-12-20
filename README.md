@@ -1,0 +1,1 @@
+Necesario tener instalado CoppeliaSim
