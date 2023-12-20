@@ -8,6 +8,9 @@ import os
 from parametros import instancia
 from Capturar import capturar
 from Agrupar import agrupar_clusters
+from caracteristicas import calcular_caracteristicas_y_generar_dataset
+from clasificarSVM import entrenar
+#from predecir import clasificador_prediccion
 
 def debug():
     etiqueta_desconectar.config(state = tkinter.ACTIVE)
@@ -78,10 +81,10 @@ def Columna1():
     etiqueta_agrupar = tkinter.Button(root, text= "Agrupar", state = tkinter.DISABLED, command = agrupar_boton)
     etiqueta_agrupar.grid(row = 5, column = 0)
     
-    etiqueta_extraer = tkinter.Button(root, text= "Extraer características", state = tkinter.DISABLED)
+    etiqueta_extraer = tkinter.Button(root, text= "Extraer características", state = tkinter.DISABLED, command = extraer_boton)
     etiqueta_extraer.grid(row = 6, column = 0)
     
-    etiqueta_entrenar = tkinter.Button(root, text= "Entrenar clasificador", state = tkinter.DISABLED)
+    etiqueta_entrenar = tkinter.Button(root, text= "Entrenar clasificador", state = tkinter.DISABLED, command = entrenar_boton)
     etiqueta_entrenar.grid(row = 7, column = 0)
     
     etiqueta_predecir = tkinter.Button(root, text= "Predecir", state = tkinter.DISABLED)
@@ -181,6 +184,7 @@ def capturar_boton():
         return
     
     capturar(path, clientID)
+    etiqueta_agrupar.config(state = tkinter.ACTIVE)
     
 def cambiar_valores():
     global caja_iteraciones,caja_cerca, caja_media, caja_lejos, caja_minpuntos, caja_maxpuntos, caja_umbral, boton_conectar
@@ -200,6 +204,14 @@ def cambiar_valores():
     
 def agrupar_boton():
     agrupar_clusters()
+    etiqueta_extraer.config(state = tkinter.ACTIVE)
+
+def extraer_boton():
+    calcular_caracteristicas_y_generar_dataset()
+    etiqueta_entrenar.config(state = tkinter.ACTIVE)
+    
+def entrenar_boton():
+    entrenar()
 
 def main():    
     global root

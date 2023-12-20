@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import numpy as np
 import pandas as pd
-import json
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -17,7 +15,6 @@ simplefilter(action='ignore', category=DeprecationWarning)
 def cargar_datos(archivo_dat):
     datos = pd.read_json(archivo_dat, lines=True)
     # Aquí asumimos que los datos en el archivo están en el formato esperado
-
     return datos
 
 # Función para dividir los datos en conjuntos de entrenamiento y prueba
@@ -32,18 +29,13 @@ def clasificar_y_evaluar(kernel, X_train, X_test, y_train, y_test):
     acc_test = accuracy_score(y_test, y_pred)
 
     print(f"Clasificación con kernel {kernel}")
-    print(f"Acc_test {kernel}: (TP+TN)/(T+P)  {acc_test:.4f}")
 
-    print("Matriz de confusión Filas: verdad Columnas: predicción")
-    print(confusion_matrix(y_test, y_pred))
-
-    print("Precision= TP / (TP + FP), Recall= TP / (TP + FN)")
     print("f1-score es la media entre precisión y recall")
     print(classification_report(y_test, y_pred))
 
     svc_cv = SVC(kernel=kernel)
     scores = cross_val_score(svc_cv, X_train, y_train, cv=5)
-    print(f"Accuracy 5-cross validation ({kernel}): {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
+    print(f"Validación final ({kernel}): {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
 
     # Guardar el clasificador en un archivo
     guardar_clasificador(svc, f"clasificador_{kernel}.pkl")
@@ -90,6 +82,5 @@ def entrenar():
 
     for kernel in kernels:
         _ = clasificar_y_evaluar(kernel, X_train, X_test, y_train, y_test)
-
-    print("\n== Búsqueda de parámetros en un rango en el caso de RBF ==")
+            
     _ = grid_search_rbf(X_train, y_train)
